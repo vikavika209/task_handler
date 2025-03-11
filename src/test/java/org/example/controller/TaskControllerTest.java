@@ -137,6 +137,15 @@ class TaskControllerTest {
     @Test
     @WithMockUser(username = "other@example.com", roles = {"USER"})
     void TestFailUpdateTask_AsUser() throws Exception {
+
+        User otherUser = User.builder()
+                .email("other@example.com")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        userRepository.save(otherUser);
+        logger.info("Assignee с ID: {} успешно создан", otherUser.getId());
+
         TaskDto updateDto = new TaskDto();
         updateDto.setStatus(TaskStatus.COMPLETED);
 
