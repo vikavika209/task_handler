@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: task_manager_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: task_meneger
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - task_manager_network
+
+  app:
+    image: openjdk:17-jdk
+    container_name: task_manager_app
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/task_meneger
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+      - SPRING_PROFILES_ACTIVE=default
+      - JWT_SECRET=dGhpcyBpcyBhIHNlY3VyZSBrZXkgZm9yIGh0dHBzIHNpZ25pbmcgdGhpcyBrZXk=
+      - JWT_EXPIRATION=86400000
+    networks:
+      - task_manager_network
+
+networks:
+  task_manager_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
