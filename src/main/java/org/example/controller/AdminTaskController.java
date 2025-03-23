@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/tasks")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin Task API", description = "Администрирование задач (CRUD) доступно только для пользователей с ролью ADMIN")
 public class AdminTaskController {
 
@@ -33,8 +35,10 @@ public class AdminTaskController {
     )
     @ApiResponse(responseCode = "200", description = "Список задач успешно получен")
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
-        List<Task> tasks = taskService.getTasks();
+    public ResponseEntity<Page<Task>> getAllTasks(@RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> tasks = taskService.getTasks(pageable);
         return ResponseEntity.ok(tasks);
     }
 

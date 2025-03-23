@@ -29,17 +29,21 @@ class TaskControllerTest {
 
     private final Logger logger = LoggerFactory.getLogger(TaskControllerTest.class);
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
     private TaskRepository taskRepository;
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    public TaskControllerTest(MockMvc mockMvc, TaskRepository taskRepository, UserRepository userRepository, ObjectMapper objectMapper) {
+        this.mockMvc = mockMvc;
+        this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
+    }
 
     private User author;
     private User assignee;
@@ -84,9 +88,10 @@ class TaskControllerTest {
     void TestGetTasksByAuthor() throws Exception {
         mockMvc.perform(get("/api/tasks/author/{authorId}", author.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is(task.getTitle())))
-                .andExpect(jsonPath("$[0].author.email", is(author.getEmail())));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is(task.getTitle())))
+                .andExpect(jsonPath("$.content[0].author.email", is(author.getEmail())));
     }
 
     @Test
@@ -94,9 +99,10 @@ class TaskControllerTest {
     void TestGetTasksByAssignee() throws Exception {
         mockMvc.perform(get("/api/tasks/assignee/{assigneeId}", assignee.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].description", is(task.getDescription())))
-                .andExpect(jsonPath("$[0].assignee.email", is(assignee.getEmail())));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].description").value(task.getDescription()))
+                .andExpect(jsonPath("$.content[0].assignee.email").value(assignee.getEmail()));
     }
 
     @Test

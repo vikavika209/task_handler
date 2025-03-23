@@ -16,9 +16,10 @@ services:
       - task_manager_network
 
   app:
-    image: openjdk:17-jdk
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: task_manager_app
-    build: .
     ports:
       - "8080:8080"
     depends_on:
@@ -29,7 +30,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
       - SPRING_PROFILES_ACTIVE=default
-      - JWT_SECRET=dGhpcyBpcyBhIHNlY3VyZSBrZXkgZm9yIGh0dHBzIHNpZ25pbmcgdGhpcyBrZXk=
+      - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRATION=86400000
     networks:
       - task_manager_network
@@ -41,3 +42,4 @@ networks:
 volumes:
   postgres_data:
     driver: local
+

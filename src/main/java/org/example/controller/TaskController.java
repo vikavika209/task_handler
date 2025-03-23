@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +40,13 @@ public class TaskController {
             @ApiResponse(responseCode = "404", description = "Автор не найден")
     })
     @GetMapping("/author/{authorId}")
-    public ResponseEntity<List<Task>> getTasksByAuthor(
+    public ResponseEntity<Page<Task>> getTasksByAuthor(
             @Parameter(description = "ID автора задач", example = "1")
-            @PathVariable Long authorId) {
-        return ResponseEntity.ok(taskService.getTasksByAuthor(authorId));
+            @PathVariable Long authorId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(taskService.getTasksByAuthor(authorId, pageable));
     }
 
     @Operation(
@@ -52,10 +58,13 @@ public class TaskController {
             @ApiResponse(responseCode = "404", description = "Исполнитель не найден")
     })
     @GetMapping("/assignee/{assigneeId}")
-    public ResponseEntity<List<Task>> getTasksByAssignee(
+    public ResponseEntity<Page<Task>> getTasksByAssignee(
             @Parameter(description = "ID исполнителя задач", example = "2")
-            @PathVariable Long assigneeId) {
-        return ResponseEntity.ok(taskService.getTasksByAssignee(assigneeId));
+            @PathVariable Long assigneeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(taskService.getTasksByAssignee(assigneeId, pageable));
     }
 
     @Operation(

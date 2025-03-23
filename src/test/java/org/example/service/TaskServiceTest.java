@@ -3,6 +3,7 @@ package org.example.service;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.example.convertor.TaskConvertor;
 import org.example.dto.TaskDto;
 import org.example.dto.UserDto;
 import org.example.entity.*;
@@ -28,10 +29,13 @@ class TaskServiceTest {
 
     private TaskService taskService;
 
+    @Mock
+    private TaskConvertor taskConvertor;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        taskService = new TaskService(taskRepository, userService);
+        taskService = new TaskService(taskRepository, userService, taskConvertor);
     }
 
     @Test
@@ -62,6 +66,7 @@ class TaskServiceTest {
         when(userService.getUserByEmail(email)).thenReturn(author);
         when(userService.getUserByEmail(assigneeEmail)).thenReturn(assignee);
         when(taskRepository.save(any(Task.class))).thenReturn(expectedTask);
+        when(taskConvertor.taskDtoToTask(any(TaskDto.class))).thenReturn(expectedTask);
 
         Task actualTask = taskService.createTask(taskDto, email, assigneeEmail);
 
@@ -139,6 +144,7 @@ class TaskServiceTest {
         when(userService.getUserById(2L)).thenReturn(assigneeUser);
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
         when(taskRepository.save(any(Task.class))).thenReturn(task);
+        when(taskConvertor.taskToDto(any(Task.class))).thenReturn(taskDto);
 
         TaskDto updatedTask = taskService.updateTask(taskId, taskDto, email, newComment);
 
